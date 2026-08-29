@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人博客 </title>
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-sidebar: #0a0a0a;
+            --bg-tag: #141414;
+            --bg-tag-hover: #1c1c1c;
+            --border-color: #1e1e1e;
+            --border-tag: #2a2a2a;
+            --text-primary: #f0f0f0;
+            --text-title: #ffffff;
+            --text-content: #c8c8c8;
+            --text-date: #a0a0a0;
+            --text-pages: #707070;
+            --accent: #5a5a5a;
+            --accent-bright: #8a8a8a;
+            --shadow-glow: 0 0 40px rgba(255, 255, 255, 0.02);
+            --radius-card: 6px;
+            --radius-tag: 3px;
+            --font-main: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            --sidebar-width: 420px;
+            --transition-speed: 0.25s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background-color: var(--bg-primary);
+            font-family: var(--font-main);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-header {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 24px 20px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .site-header h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--text-title);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.08);
+            user-select: none;
+            transition: text-shadow var(--transition-speed) ease;
+        }
+
+        .site-header h1:hover {
+            text-shadow: 0 0 50px rgba(255, 255, 255, 0.15);
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            min-height: 0;
+            position: relative;
+        }
+
+        .main-content {
+            flex: 1;
+            background-color: var(--bg-primary);
+            min-width: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            flex-shrink: 0;
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 16px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            scrollbar-width: thin;
+            scrollbar-color: #222 #000;
+            box-shadow: -4px 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 3;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #333;
+        }
+
+        .article-card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .article-card:hover {
+            border-color: #2e2e2e;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 255, 255, 0.02);
+        }
+
+        .article-tag {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--bg-tag);
+            border-bottom: 1px solid var(--border-tag);
+            padding: 8px 14px;
+            font-size: 0.78rem;
+            letter-spacing: 0.04em;
+            user-select: none;
+            transition: background-color var(--transition-speed) ease;
+            flex-shrink: 0;
+        }
+
+        .article-card:hover .article-tag {
+            background-color: var(--bg-tag-hover);
+        }
+
+        .article-tag .tag-date {
+            color: var(--text-date);
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .article-tag .tag-pages {
+            color: var(--text-pages);
+            font-weight: 400;
+            font-size: 0.72rem;
+            background-color: rgba(255, 255, 255, 0.04);
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            letter-spacing: 0.05em;
+        }
+
+        .article-body {
+            padding: 16px 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .article-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-title);
+            letter-spacing: 0.02em;
+            line-height: 1.4;
+            position: relative;
+            padding-left: 12px;
+            min-height: 1.4em;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .article-title:empty::before {
+            display: none;
+        }
+
+        .article-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 70%;
+            background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+            border-radius: 4px;
+            opacity: 0.7;
+            transition: opacity var(--transition-speed) ease, height var(--transition-speed) ease;
+        }
+
+        .article-title:empty {
+            padding-left: 0;
+        }
+
+        .article-title:empty::before {
+            opacity: 0;
+            height: 0;
+        }
+
+        .article-card:hover .article-title::before {
+            opacity: 1;
+            height: 85%;
+        }
+
+        .article-content {
+            font-size: 0.88rem;
+            color: var(--text-content);
+            line-height: 1.75;
+            letter-spacing: 0.015em;
+            word-break: break-word;
+            white-space: pre-wrap;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .article-card:hover .article-content {
+            color: #d8d8d8;
+        }
+
+        /* 锁定区域样式 */
+        .lock-container {
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.01);
+            border-top: 1px solid #111;
+        }
+
+        .lock-icon {
+            font-size: 2.2rem;
+            filter: grayscale(0.8);
+            opacity: 0.7;
+            user-select: none;
+        }
+
+        .lock-hint {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #aaa;
+            line-height: 1.5;
+            letter-spacing: 0.02em;
+        }
+
+        .lock-hint strong {
+            color: #ccc;
+            font-weight: 600;
+        }
+
+        .lock-input-group {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 240px;
+        }
+
+        .lock-input {
+            flex: 1;
+            background: #111;
+            border: 1px solid #2a2a2a;
+            border-radius: 4px;
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: var(--font-main);
+            letter-spacing: 0.1em;
+            caret-color: #888;
+        }
+
+        .lock-input:focus {
+            border-color: #555;
+        }
+
+        .lock-input::placeholder {
+            color: #555;
+            letter-spacing: 0.05em;
+        }
+
+        .lock-button {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 4px;
+            padding: 0 14px;
+            color: #ccc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: var(--font-main);
+            letter-spacing: 0.05em;
+        }
+
+        .lock-button:hover {
+            background: #222;
+            border-color: #444;
+            color: #fff;
+        }
+
+        .lock-error {
+            color: #c76b6b;
+            font-size: 0.75rem;
+            min-height: 18px;
+            letter-spacing: 0.03em;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .lock-error.show {
+            opacity: 1;
+        }
+
+        /* 隐藏卡片默认 */
+        .hidden-card {
+            display: none !important;
+        }
+
+        /* 第四篇标题为空白，保留占位 */
+        .article-title.empty-title {
+            padding-left: 0;
+        }
+        .article-title.empty-title::before {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 100%;
+            }
+
+            body {
+                overflow: auto;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+                overflow: visible;
+            }
+
+            .main-content {
+                display: none;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                overflow-y: visible;
+                padding: 12px 12px 20px;
+                gap: 16px;
+                box-shadow: none;
+            }
+
+            .site-header {
+                padding: 20px 16px 14px;
+            }
+
+            .site-header h1 {
+                font-size: 1.8rem;
+                letter-spacing: 0.04em;
+            }
+
+            .article-body {
+                padding: 14px 14px 16px;
+            }
+
+            .article-tag {
+                padding: 6px 12px;
+                font-size: 0.72rem;
+            }
+
+            .lock-container {
+                padding: 18px 16px;
+                gap: 14px;
+            }
+
+            .lock-input-group {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .site-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .article-title {
+                font-size: 1.05rem;
+            }
+
+            .article-content {
+                font-size: 0.82rem;
+                line-height: 1.65;
+            }
+
+            .article-tag {
+                font-size: 0.68rem;
+                padding: 5px 10px;
+            }
+
+            .article-tag .tag-pages {
+                font-size: 0.65rem;
+                padding: 2px 8px;
+            }
+
+            .lock-icon {
+                font-size: 1.8rem;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .article-card {
+            animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .article-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .article-card:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .article-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <h1>我的个人博客</h1>
+    </header>
+
+    <div class="main-wrapper">
+        <div class="main-content"></div>
+
+        <aside class="sidebar">
+            <!-- 第一篇文章 -->
+            <article class="article-card">
+                <div class="article-tag">
+                    <span class="tag-date">2010-0105</span>
+                    <span class="tag-pages">1页</span>
+                </div>
+                <div class="article-body">
+                    <h2 class="article-title">入职</h2>
+                    <p class="article-content">今天正式加入UEL了。他们说这是为了科学进步，挑选自愿者进行游戏测试。虽然面试过程有点奇怪，但我相信我的记录能力能在这里发光发热。一切都显得那么正规，未来可期。</p>
+                </div>
+            </article>
+
+            <!-- 第二篇文章 -->
+            <article class="article-card">
+                <div class="article-tag">
+                    <span class="tag-date">2011-0826</span>
+                    <span class="tag-pages">2页</span>
+                </div>
+                <div class="article-body">
+                    <h2 class="article-title">妈的这个破公司</h2>
+                    <p class="article-content">入职时说得好听，"平等""尊重""共同进步"，结果呢？我连买瓶水的钱都要从牙缝里省。管理层那帮人，办公室铺地毯、喝现磨咖啡，我们连个饮水机都得自己凑钱买。测试员被关在小黑屋里肝我的世界，肝到眼睛充血，还要被扣工资——"操作失误""效率不达标""表情不够投入"？？？扣钱的理由比我妈骂我的理由还离谱。最绝的是，上次团建让我们自己掏钱买盒饭，领导还发了条博客："感恩团队，一起奋斗！"奋斗你个头啊，我奋斗的动力全特么是负数。</p>
+                </div>
+            </article>
+
+            <!-- 第三篇文章（加密） -->
+            <article class="article-card" id="article-3">
+                <!-- 锁定状态 -->
+                <div class="article-tag locked-tag">
+                    <span class="tag-date">🔒 2012-0106</span>
+                    <span class="tag-pages">??页</span>
+                </div>
+                <div class="lock-container" id="lock-container">
+                    <div class="lock-icon">🔒</div>
+                    <div class="lock-hint">
+                        此文章已加密 · 提示：<strong>“我看病的日子”</strong><br>
+                        请输入密码查看
+                    </div>
+                    <div class="lock-input-group">
+                        <input type="password" class="lock-input" id="lock-input" placeholder="密码" maxlength="20">
+                        <button class="lock-button" id="unlock-btn">解锁</button>
+                    </div>
+                    <div class="lock-error" id="lock-error">密码错误，请重试</div>
+                </div>
+
+                <!-- 解锁后内容 -->
+                <div class="article-body unlocked-content" id="unlocked-content" style="display: none;">
+                    <h2 class="article-title">他们都在看我</h2>
+                    <p class="article-content">记录室里好安静，安静得能听见骨头的咯吱声。不，是游戏里的方块在响。我看到他们了，那些测试员，他们的脸贴在显示器上，扭曲变形，对我笑。但他们的嘴唇没动，声音却从墙壁里渗出来：“水……给我水……”哈哈哈，一群蠢货！我给了，我明明给了！可那个主管的影子为什么站在我背后？他在我的键盘上敲下“■■”两个字。闭嘴！都闭嘴！我的脑子像被熔岩浇灌，思绪裂成一块块数据碎片。那个黑色的东西在游戏里生成了一串乱码，它在模仿我。它在叫我爸爸。</p>
+                </div>
+            </article>
+
+            <!-- 第四篇文章（无密码，标题空白，初始隐藏，解锁后显示并弹窗） -->
+            <article class="article-card hidden-card" id="article-4">
+                <div class="article-tag">
+                    <span class="tag-date">2012-0130</span>
+                    <span class="tag-pages">1页</span>
+                </div>
+                <div class="article-body">
+                    <h2 class="article-title empty-title"></h2>
+                    <p class="article-content">好冷啊，冷到骨子里去了...</p>
+                </div>
+            </article>
+        </aside>
+    </div>
+
+    <script>
+        (function() {
+            const lockContainer = document.getElementById('lock-container');
+            const unlockedContent = document.getElementById('unlocked-content');
+            const lockInput = document.getElementById('lock-input');
+            const unlockBtn = document.getElementById('unlock-btn');
+            const lockError = document.getElementById('lock-error');
+            const article3 = document.getElementById('article-3');
+            const article4 = document.getElementById('article-4');
+            const lockedTag = article3.querySelector('.locked-tag');
+
+            const CORRECT_PASSWORD = '20120106';
+            let isUnlocked = false;      // 防止重复解锁
+            let popupShown = false;      // 弹窗只显示一次
+
+            function unlockArticle() {
+                const entered = lockInput.value.trim();
+                if (entered === CORRECT_PASSWORD && !isUnlocked) {
+                    isUnlocked = true;
+                    lockContainer.style.display = 'none';
+                    unlockedContent.style.display = 'flex';
+                    // 更新第三篇小条
+                    lockedTag.innerHTML = `
+                        <span class="tag-date">2012-0106</span>
+                        <span class="tag-pages">3页</span>
+                    `;
+                    // 显示第四篇
+                    article4.classList.remove('hidden-card');
+                    // 清除错误
+                    lockError.classList.remove('show');
+                    lockInput.value = '';
+
+                    // 第四篇显示后，弹出浏览器窗口提示（只弹一次）
+                    if (!popupShown) {
+                        popupShown = true;
+                        // 延迟一点确保第四篇 DOM 渲染完成
+                        setTimeout(() => {
+                            alert('水好冷...');
+                        }, 200);
+                    }
+                } else if (entered !== CORRECT_PASSWORD) {
+                    lockError.classList.add('show');
+                    lockInput.value = '';
+                    lockInput.focus();
+                    // 抖动反馈
+                    article3.style.animation = 'none';
+                    setTimeout(() => {
+                        article3.style.animation = 'shake 0.2s ease';
+                    }, 10);
+                }
+            }
+
+            // 添加抖动关键帧
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                @keyframes shake {
+                    0% { transform: translateX(0); }
+                    25% { transform: translateX(-4px); }
+                    50% { transform: translateX(4px); }
+                    75% { transform: translateX(-2px); }
+                    100% { transform: translateX(0); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            unlockBtn.addEventListener('click', unlockArticle);
+            lockInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    unlockArticle();
+                }
+            });
+
+            lockInput.addEventListener('focus', () => {
+                lockError.classList.remove('show');
+            });
+        })();
+    </script>
+</body>
+</html>
